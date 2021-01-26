@@ -1,8 +1,0 @@
-type Todo @model @auth(rules: [
-  { allow: owner },
-  { allow: groups, groups: ["Admin"] }
-  ]){
-  id: ID!
-  name: String!
-  description: String
-}

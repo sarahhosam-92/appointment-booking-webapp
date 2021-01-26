@@ -11,6 +11,8 @@ import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
 import SnackBar from "material-ui/Snackbar";
 import Card from "material-ui/Card";
+import LoadingOverlay from 'react-loading-overlay';
+
 
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react'
 import {
@@ -21,6 +23,7 @@ import {
 } from "material-ui/Stepper";
 import { RadioButton, RadioButtonGroup } from "material-ui/RadioButton";
 import axios from "axios";
+import { Paper } from "@material-ui/core";
 
 const API_BASE = "https://xupmk08w65.execute-api.us-east-2.amazonaws.com/dev/";
 
@@ -39,7 +42,9 @@ class BookAppointment extends Component {
       validPhone: true,
       finished: false,
       smallScreen: window.innerWidth < 768,
-      stepIndex: 0
+      stepIndex: 0,
+      isActive: false,
+      bookingSuccessful: false
     };
   }
   componentWillMount() {
@@ -59,7 +64,7 @@ class BookAppointment extends Component {
     this.setState({ appointmentMeridiem: meridiem });
   }
   handleSubmit() {
-    this.setState({ confirmationModalOpen: false });
+    this.setState({ confirmationModalOpen: false ,isActive:true});
     const newAppointment = {
       name: this.state.firstName + " " + this.state.lastName,
       email: this.state.email,
@@ -74,7 +79,8 @@ class BookAppointment extends Component {
         this.setState({
           confirmationSnackbarMessage: "Appointment succesfully added!",
           confirmationSnackbarOpen: true,
-          processed: true
+          processed: true,
+          isActive:false
         })
       )
       .catch(err => {
@@ -257,10 +263,7 @@ class BookAppointment extends Component {
       </div>
     );
   }
-
-
-
-  render() {
+  renderForm(){
     const {
       finished,
       isLoading,
@@ -302,6 +305,7 @@ class BookAppointment extends Component {
       />
     ];
     return (
+
       <div>
         <AppBar
           title="Appointment Scheduler"
@@ -311,13 +315,22 @@ class BookAppointment extends Component {
           style={{
             maxWidth: !smallScreen ? "80%" : "100%",
             margin: "auto",
-            marginTop: !smallScreen ? 20 : 0
+            marginTop: !smallScreen ? 20 : 0,
+            
           }}
         >
+          <LoadingOverlay
+            active={this.state.isActive}
+            spinner
+            text='Booking...'
+          >
+
           <Card
             style={{
               padding: "12px 12px 25px 12px",
-              height: smallScreen ? "100vh" : null
+              height: smallScreen ? "100vh" : null,
+              
+              
             }}
           >
             <Stepper
@@ -325,7 +338,9 @@ class BookAppointment extends Component {
               orientation="vertical"
               linear={false}
             >
+              
               <Step>
+  
                 <StepLabel>
                   Choose an available day for your appointment
                 </StepLabel>
@@ -440,6 +455,7 @@ class BookAppointment extends Component {
               </Step>
             </Stepper>
           </Card>
+          </LoadingOverlay>
           <Dialog
             modal={true}
             open={confirmationModalOpen}
@@ -476,5 +492,64 @@ class BookAppointment extends Component {
       </div>
     );
   }
+renderSuccess(){
+  const {
+    finished,
+    isLoading,
+    smallScreen,
+    stepIndex,
+    confirmationModalOpen,
+    confirmationSnackbarOpen,
+    ...data
+  } = this.state;
+
+  return(
+    <div>
+    <AppBar
+      title="Appointment Scheduler"
+      showMenuIconButton={false}
+    />
+    <section
+      style={{
+        maxWidth: !smallScreen ? "80%" : "100%",
+        margin: "auto",
+        marginTop: !smallScreen ? 20 : 0
+      }}
+      >
+ <Card
+            style={{
+              padding: "12px 12px 25px 12px",
+              height: smallScreen ? "100vh" : null,
+              
+              
+            }}
+          >
+            <Typography>
+              success
+            </Typography>
+
+          </Card>
+        
+    </section>
+    </div>
+  
+  )
+
 }
+
+  render() {
+    return(
+      <div>
+
+      {this.state.processed ? this.renderSuccess():this.renderForm()}
+    
+      </div>
+    );
+  
+  
+  
+  }
+
+}
+
 export default BookAppointment;
