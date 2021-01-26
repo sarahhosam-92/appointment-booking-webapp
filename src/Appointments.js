@@ -32,10 +32,14 @@ const Appointments = () => {
       console.log("response via db: ", response.data);
       const eventsArr = [];
       response.data.map((e, index) => {
+        const date = new Date(e.startDate.replace( /(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1"));
+        const day = date.getDate();
+        const month = date.getMonth();
+        console.log(date);
         const event = {
           'title': e.name,
-          'start': new Date(2021, 0, 18, 9 + parseInt(e.time), 0, 0, 0),
-          'end': new Date(2021, 0, 18, 10 + parseInt(e.time), 0, 0, 0),
+          'start': new Date(2021, month, day, 9 + parseInt(e.time), 0, 0, 0),
+          'end': new Date(2021, month, day, 10 + parseInt(e.time), 0, 0, 0),
         }
         eventsArr.push(event);
         console.log(eventsArr);
